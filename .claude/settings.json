@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "permissions": {
+    "allow": [
+      {
+        "type": "shell",
+        "reason": "Python/uvベースの一般的な開発作業（依存導入、起動、テスト、整形、マイグレーション）を許可",
+        "commands": [
+          "uv sync",
+          "uv run uvicorn app.main:app --reload",
+          "uv run python -m pytest",
+          "uv run pytest",
+          "uv run ruff check .",
+          "uv run ruff format .",
+          "uv run black .",
+          "uv run isort .",
+          "uv run mypy .",
+          "uv run alembic upgrade head",
+          "uv run alembic downgrade -1",
+          "uv run alembic revision --autogenerate -m *",
+          "uv run alembic current",
+          "uv run alembic history"
+        ]
+      },
+      {
+        "type": "shell",
+        "reason": "Gitの一般操作を許可（差分確認、ブランチ、コミット、PR前の準備）",
+        "commands": [
+          "git status",
+          "git diff",
+          "git diff --staged",
+          "git log --oneline --decorate -n *",
+          "git branch",
+          "git checkout *",
+          "git switch *",
+          "git add *",
+          "git commit -m *",
+          "git restore *",
+          "git reset --soft *",
+          "git reset --mixed *"
+        ]
+      },
+      {
+        "type": "filesystem",
+        "reason": "リポジトリ内の通常編集を許可（.env等の機密は除外推奨）",
+        "read": [
+          "**/*"
+        ],
+        "write": [
+          "**/*"
+        ],
+        "deny": [
+          ".env",
+          "**/.env",
+          "**/*.pem",
+          "**/*id_rsa*",
+          "**/*secret*",
+          "**/secrets/**"
+        ]
+      }
+    ]
+  },
+  "safety": {
+    "denyNetworkByDefault": true,
+    "notes": "外部ネットワークアクセスやデプロイ系コマンドは明示的に追加するまで拒否"
+  }
+}
