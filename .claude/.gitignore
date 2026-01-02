@@ -1,0 +1,5 @@
+# Claude Code local settings (not shared with team)
+settings.local.json
+
+# Session data
+sessions/
