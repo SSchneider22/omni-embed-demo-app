@@ -2,7 +2,6 @@
 import base64
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Request, Response
-from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, EmailStr
 from app.db import get_db

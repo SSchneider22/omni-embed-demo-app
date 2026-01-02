@@ -1,7 +1,7 @@
 """FastAPI application."""
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-from fastapi.staticfiles import StaticFiles
+from fastapi.staticfiles import StaticFiles  # noqa: F401 - Reserved for future use
 from app.config import config
 from app.routes import api, pages
 

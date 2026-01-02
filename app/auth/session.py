@@ -1,5 +1,5 @@
 """Session management using signed cookies."""
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Optional
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 from fastapi import Request, Response
