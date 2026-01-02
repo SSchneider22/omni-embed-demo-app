@@ -36,7 +36,8 @@
           "git add *",
           "git commit -m *",
           "git restore *",
-          "git reset *"
+          "git reset --soft *",
+          "git reset --mixed *"
         ]
       },
       {
