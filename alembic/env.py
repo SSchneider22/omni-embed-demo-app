@@ -10,7 +10,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from app.db import Base
-from app.models import User, AuditLog
+from app.models import User, AuditLog  # noqa: F401 - Required for Alembic autogenerate
 from app.config import config as app_config
 
 # this is the Alembic Config object, which provides

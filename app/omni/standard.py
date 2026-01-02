@@ -1,5 +1,4 @@
 """Standard SSO implementation for Omni Embed."""
-from typing import Optional
 from fastapi import HTTPException, status
 from app.config import config
 from app.omni.client import omni_client
@@ -56,7 +55,7 @@ async def generate_embed_url_for_user(
 
         return embed_url
 
-    except Exception as e:
+    except Exception:
         # Log error but don't expose sensitive details
         # In production, use proper logging
         raise HTTPException(
