@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}マイページ - Omni Embed Demo{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>マイページ</h2>
+
+    <div style="margin: 1.5rem 0;">
+        <p><strong>メールアドレス:</strong> {{ user.email }}</p>
+        <p><strong>顧客ID:</strong> {{ user.customer_id }}</p>
+        <p><strong>登録日:</strong> {{ user.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+    </div>
+
+    <div style="margin-top: 2rem;">
+        <h3>購買分析レポート</h3>
+        <p style="margin: 1rem 0;">Omni Embedで購買データを分析できます。</p>
+
+        <div style="margin-top: 1rem;">
+            <p><strong>利用可能なレポート:</strong></p>
+            <ul style="margin-left: 2rem; margin-top: 0.5rem;">
+                <li style="margin: 0.5rem 0;">
+                    <a href="/embed?contentPath=/dashboards/example"
+                       style="color: #3498db; text-decoration: none;">
+                        購買ダッシュボード
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <p style="margin-top: 1.5rem; padding: 1rem; background: #fff3cd; border-radius: 4px; color: #856404;">
+            <strong>注意:</strong> 実際のOmni設定が必要です。環境変数でOmni認証情報とコンテンツパスを設定してください。
+        </p>
+    </div>
+</div>
+{% endblock %}
