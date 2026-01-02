@@ -19,9 +19,7 @@
           "uv run alembic downgrade -1",
           "uv run alembic revision --autogenerate -m *",
           "uv run alembic current",
-          "uv run alembic history",
-          "uv run python -m compileall app",
-          "uv run python -c *"
+          "uv run alembic history"
         ]
       },
       {
