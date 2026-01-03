@@ -1,67 +1,43 @@
 {
-  "version": 1,
   "permissions": {
     "allow": [
-      {
-        "type": "shell",
-        "reason": "Python/uvベースの一般的な開発作業（依存導入、起動、テスト、整形、マイグレーション）を許可",
-        "commands": [
-          "uv sync",
-          "uv run uvicorn app.main:app --reload",
-          "uv run python -m pytest",
-          "uv run pytest",
-          "uv run ruff check .",
-          "uv run ruff format .",
-          "uv run black .",
-          "uv run isort .",
-          "uv run mypy .",
-          "uv run alembic upgrade head",
-          "uv run alembic downgrade -1",
-          "uv run alembic revision --autogenerate -m *",
-          "uv run alembic current",
-          "uv run alembic history"
-        ]
-      },
-      {
-        "type": "shell",
-        "reason": "Gitの一般操作を許可（差分確認、ブランチ、コミット、PR前の準備）",
-        "commands": [
-          "git status",
-          "git diff",
-          "git diff --staged",
-          "git log --oneline --decorate -n *",
-          "git branch",
-          "git checkout *",
-          "git switch *",
-          "git add *",
-          "git commit -m *",
-          "git restore *",
-          "git reset --soft *",
-          "git reset --mixed *"
-        ]
-      },
-      {
-        "type": "filesystem",
-        "reason": "リポジトリ内の通常編集を許可（.env等の機密は除外推奨）",
-        "read": [
-          "**/*"
-        ],
-        "write": [
-          "**/*"
-        ],
-        "deny": [
-          ".env",
-          "**/.env",
-          "**/*.pem",
-          "**/*id_rsa*",
-          "**/*secret*",
-          "**/secrets/**"
-        ]
-      }
+      "Bash(uv sync)",
+      "Bash(uv run uvicorn app.main:app --reload)",
+      "Bash(uv run python -m pytest:*)",
+      "Bash(uv run pytest:*)",
+      "Bash(uv run ruff:*)",
+      "Bash(uv run black:*)",
+      "Bash(uv run isort:*)",
+      "Bash(uv run mypy:*)",
+      "Bash(uv run alembic:*)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git branch)",
+      "Bash(git checkout:*)",
+      "Bash(git switch:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m:*)",
+      "Bash(git restore:*)",
+      "Bash(git reset --soft:*)",
+      "Bash(git reset --mixed:*)",
+      "Read(**/*)",
+      "Edit(**/*)"
+    ],
+    "deny": [
+      "WebFetch",
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Edit(./.env)",
+      "Edit(./.env.*)",
+      "Read(**/*.pem)",
+      "Edit(**/*.pem)",
+      "Read(**/*id_rsa*)",
+      "Edit(**/*id_rsa*)",
+      "Read(**/*secret*)",
+      "Edit(**/*secret*)",
+      "Read(**/secrets/**)",
+      "Edit(**/secrets/**)"
     ]
-  },
-  "safety": {
-    "denyNetworkByDefault": true,
-    "notes": "外部ネットワークアクセスやデプロイ系コマンドは明示的に追加するまで拒否"
   }
 }
