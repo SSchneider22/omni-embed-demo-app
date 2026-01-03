@@ -45,8 +45,11 @@
                 try {
                     const response = JSON.parse(evt.detail.xhr.responseText);
                     errorMessage = response.detail || errorMessage;
-                } catch (e) {
-                    // If parsing fails, use default message
+                } catch (error) {
+                    // JSON parsing error indicates invalid server response
+                    errorMessage = error instanceof SyntaxError
+                        ? 'サーバーからの応答が不正です'
+                        : errorMessage;
                 }
             }
             const errorDiv = document.createElement('div');
