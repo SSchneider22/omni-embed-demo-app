@@ -50,10 +50,20 @@
             if (response.ok) {
                 window.location.href = '/me';
             } else {
-                document.getElementById('message').innerHTML = `<div class="error">${data.detail || 'ログインに失敗しました'}</div>`;
+                const messageDiv = document.getElementById('message');
+                messageDiv.innerHTML = '';
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error';
+                errorDiv.textContent = data.detail || 'ログインに失敗しました';
+                messageDiv.appendChild(errorDiv);
             }
         } catch (error) {
-            document.getElementById('message').innerHTML = '<div class="error">通信エラーが発生しました</div>';
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = '';
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+            errorDiv.textContent = '通信エラーが発生しました';
+            messageDiv.appendChild(errorDiv);
         }
     });
 </script>

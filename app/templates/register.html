@@ -55,13 +55,28 @@
             const data = await response.json();
 
             if (response.ok) {
-                document.getElementById('message').innerHTML = '<div class="success">登録が完了しました。ログインしてください。</div>';
+                const messageDiv = document.getElementById('message');
+                messageDiv.innerHTML = '';
+                const successDiv = document.createElement('div');
+                successDiv.className = 'success';
+                successDiv.textContent = '登録が完了しました。ログインしてください。';
+                messageDiv.appendChild(successDiv);
                 setTimeout(() => window.location.href = '/login', 2000);
             } else {
-                document.getElementById('message').innerHTML = `<div class="error">${data.detail || '登録に失敗しました'}</div>`;
+                const messageDiv = document.getElementById('message');
+                messageDiv.innerHTML = '';
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error';
+                errorDiv.textContent = data.detail || '登録に失敗しました';
+                messageDiv.appendChild(errorDiv);
             }
         } catch (error) {
-            document.getElementById('message').innerHTML = '<div class="error">通信エラーが発生しました</div>';
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = '';
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+            errorDiv.textContent = '通信エラーが発生しました';
+            messageDiv.appendChild(errorDiv);
         }
     });
 </script>
