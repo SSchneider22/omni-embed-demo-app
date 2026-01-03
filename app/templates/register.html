@@ -8,7 +8,7 @@
 
     <div id="message"></div>
 
-    <form id="registerForm">
+    <form hx-post="/api/register" hx-ext="json-enc" hx-swap="none">
         <div class="form-group">
             <label for="email">メールアドレス</label>
             <input type="email" id="email" name="email" required>
@@ -34,48 +34,34 @@
 </div>
 
 <script>
-    document.getElementById('registerForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
+    document.body.addEventListener('htmx:afterRequest', function(evt) {
+        // Only handle events from the register form
+        if (evt.detail.target.tagName !== 'FORM' || !evt.detail.target.querySelector('[name="customer_id"]')) {
+            return;
+        }
 
-        const formData = {
-            email: document.getElementById('email').value,
-            password: document.getElementById('password').value,
-            customer_id: document.getElementById('customer_id').value
-        };
+        const messageDiv = document.getElementById('message');
+        messageDiv.innerHTML = '';
 
-        try {
-            const response = await fetch('/api/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                const messageDiv = document.getElementById('message');
-                messageDiv.innerHTML = '';
-                const successDiv = document.createElement('div');
-                successDiv.className = 'success';
-                successDiv.textContent = '登録が完了しました。ログインしてください。';
-                messageDiv.appendChild(successDiv);
-                setTimeout(() => window.location.href = '/login', 2000);
-            } else {
-                const messageDiv = document.getElementById('message');
-                messageDiv.innerHTML = '';
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'error';
-                errorDiv.textContent = data.detail || '登録に失敗しました';
-                messageDiv.appendChild(errorDiv);
+        if (evt.detail.successful) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success';
+            successDiv.textContent = '登録が完了しました。ログインしてください。';
+            messageDiv.appendChild(successDiv);
+            setTimeout(() => window.location.href = '/login', 2000);
+        } else {
+            let errorMessage = '登録に失敗しました';
+            if (evt.detail.xhr && evt.detail.xhr.responseText) {
+                try {
+                    const response = JSON.parse(evt.detail.xhr.responseText);
+                    errorMessage = response.detail || errorMessage;
+                } catch (e) {
+                    // If parsing fails, use default message
+                }
             }
-        } catch (error) {
-            const messageDiv = document.getElementById('message');
-            messageDiv.innerHTML = '';
             const errorDiv = document.createElement('div');
             errorDiv.className = 'error';
-            errorDiv.textContent = '通信エラーが発生しました';
+            errorDiv.textContent = errorMessage;
             messageDiv.appendChild(errorDiv);
         }
     });
