@@ -157,3 +157,89 @@ def test_session_cookie_attributes(client, test_user):
 
     # SameSite prevents CSRF
     assert "SameSite" in set_cookie_header
+
+
+def test_login_basic_auth(client, test_user):
+    """Test login with Basic Auth."""
+    import base64
+    credentials = f"{test_user.email}:testpassword123"
+    encoded = base64.b64encode(credentials.encode()).decode()
+
+    response = client.post("/api/login", headers={
+        "Authorization": f"Basic {encoded}"
+    })
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["message"] == "Login successful"
+    assert "user_id" in data
+
+    # Check session cookie is set
+    assert "session" in response.cookies
+
+
+def test_login_basic_auth_invalid(client, test_user):
+    """Test login with invalid Basic Auth."""
+    import base64
+    credentials = f"{test_user.email}:wrongpassword"
+    encoded = base64.b64encode(credentials.encode()).decode()
+
+    response = client.post("/api/login", headers={
+        "Authorization": f"Basic {encoded}"
+    })
+
+    assert response.status_code == 401
+    assert response.json()["detail"] == "Invalid credentials"
+
+
+def test_register_user_duplicate_customer_id(client, test_user):
+    """Test registration with duplicate customer_id."""
+    response = client.post("/api/register", json={
+        "email": "another@example.com",
+        "password": "somepassword123",
+        "customer_id": test_user.customer_id
+    })
+
+    # Should fail with 400 but not reveal that customer_id exists (enumeration protection)
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Registration failed"
+
+
+def test_rate_limit_register(client):
+    """Test rate limiting on register endpoint."""
+    # Make 5 requests (should succeed)
+    for i in range(5):
+        response = client.post("/api/register", json={
+            "email": f"user{i}@example.com",
+            "password": "password123",
+            "customer_id": f"customer-{i}"
+        })
+        assert response.status_code == 200
+
+    # 6th request should be rate limited
+    response = client.post("/api/register", json={
+        "email": "user6@example.com",
+        "password": "password123",
+        "customer_id": "customer-6"
+    })
+    assert response.status_code == 429
+    assert "Too many requests" in response.json()["detail"]
+
+
+def test_rate_limit_login(client, test_user):
+    """Test rate limiting on login endpoint."""
+    # Make 5 failed login attempts (should all be processed)
+    for _ in range(5):
+        response = client.post("/api/login", json={
+            "email": test_user.email,
+            "password": "wrongpassword"
+        })
+        assert response.status_code == 401
+
+    # 6th request should be rate limited
+    response = client.post("/api/login", json={
+        "email": test_user.email,
+        "password": "wrongpassword"
+    })
+    assert response.status_code == 429
+    assert "Too many requests" in response.json()["detail"]
