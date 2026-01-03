@@ -21,6 +21,7 @@
       "Bash(git restore:*)",
       "Bash(git reset --soft:*)",
       "Bash(git reset --mixed:*)",
+      "Bash(gh issue view:*)",
       "Read(**/*)",
       "Edit(**/*)"
     ],
