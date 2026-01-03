@@ -8,7 +8,7 @@
 
     <div id="message"></div>
 
-    <form hx-post="/api/register" hx-target="#message" hx-swap="innerHTML">
+    <form hx-post="/api/register" hx-ext="json-enc" hx-swap="none">
         <div class="form-group">
             <label for="email">メールアドレス</label>
             <input type="email" id="email" name="email" required>
@@ -35,12 +35,37 @@
 
 <script>
     document.body.addEventListener('htmx:afterRequest', function(evt) {
+        // Only handle events from the register form
+        if (evt.detail.target.tagName !== 'FORM' || !evt.detail.target.querySelector('[name="customer_id"]')) {
+            return;
+        }
+
+        const messageDiv = document.getElementById('message');
+        messageDiv.innerHTML = '';
+
         if (evt.detail.successful) {
-            document.getElementById('message').innerHTML = '<div class="success">登録が完了しました。ログインしてください。</div>';
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success';
+            successDiv.textContent = '登録が完了しました。ログインしてください。';
+            messageDiv.appendChild(successDiv);
             setTimeout(() => window.location.href = '/login', 2000);
         } else {
-            const response = JSON.parse(evt.detail.xhr.responseText);
-            document.getElementById('message').innerHTML = `<div class="error">${response.detail || '登録に失敗しました'}</div>`;
+            let errorMessage = '登録に失敗しました';
+            if (evt.detail.xhr && evt.detail.xhr.responseText) {
+                try {
+                    const response = JSON.parse(evt.detail.xhr.responseText);
+                    errorMessage = response.detail || errorMessage;
+                } catch (error) {
+                    // JSON parsing error indicates invalid server response
+                    errorMessage = error instanceof SyntaxError
+                        ? 'サーバーからの応答が不正です'
+                        : errorMessage;
+                }
+            }
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+            errorDiv.textContent = errorMessage;
+            messageDiv.appendChild(errorDiv);
         }
     });
 </script>

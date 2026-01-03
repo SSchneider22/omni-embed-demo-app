@@ -8,7 +8,7 @@
 
     <div id="message"></div>
 
-    <form hx-post="/api/login" hx-target="#message" hx-swap="innerHTML">
+    <form hx-post="/api/login" hx-ext="json-enc" hx-swap="none">
         <div class="form-group">
             <label for="email">メールアドレス</label>
             <input type="email" id="email" name="email" required>
@@ -29,11 +29,33 @@
 
 <script>
     document.body.addEventListener('htmx:afterRequest', function(evt) {
+        // Only handle events from the login form (no customer_id field)
+        if (evt.detail.target.tagName !== 'FORM' || evt.detail.target.querySelector('[name="customer_id"]')) {
+            return;
+        }
+
         if (evt.detail.successful) {
             window.location.href = '/me';
         } else {
-            const response = JSON.parse(evt.detail.xhr.responseText);
-            document.getElementById('message').innerHTML = `<div class="error">${response.detail || 'ログインに失敗しました'}</div>`;
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = '';
+
+            let errorMessage = 'ログインに失敗しました';
+            if (evt.detail.xhr && evt.detail.xhr.responseText) {
+                try {
+                    const response = JSON.parse(evt.detail.xhr.responseText);
+                    errorMessage = response.detail || errorMessage;
+                } catch (error) {
+                    // JSON parsing error indicates invalid server response
+                    errorMessage = error instanceof SyntaxError
+                        ? 'サーバーからの応答が不正です'
+                        : errorMessage;
+                }
+            }
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+            errorDiv.textContent = errorMessage;
+            messageDiv.appendChild(errorDiv);
         }
     });
 </script>
