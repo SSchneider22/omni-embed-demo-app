@@ -8,7 +8,7 @@
 
     <div id="message"></div>
 
-    <form hx-post="/api/register" hx-target="#message" hx-swap="innerHTML">
+    <form id="registerForm">
         <div class="form-group">
             <label for="email">メールアドレス</label>
             <input type="email" id="email" name="email" required>
@@ -34,13 +34,34 @@
 </div>
 
 <script>
-    document.body.addEventListener('htmx:afterRequest', function(evt) {
-        if (evt.detail.successful) {
-            document.getElementById('message').innerHTML = '<div class="success">登録が完了しました。ログインしてください。</div>';
-            setTimeout(() => window.location.href = '/login', 2000);
-        } else {
-            const response = JSON.parse(evt.detail.xhr.responseText);
-            document.getElementById('message').innerHTML = `<div class="error">${response.detail || '登録に失敗しました'}</div>`;
+    document.getElementById('registerForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const formData = {
+            email: document.getElementById('email').value,
+            password: document.getElementById('password').value,
+            customer_id: document.getElementById('customer_id').value
+        };
+
+        try {
+            const response = await fetch('/api/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                document.getElementById('message').innerHTML = '<div class="success">登録が完了しました。ログインしてください。</div>';
+                setTimeout(() => window.location.href = '/login', 2000);
+            } else {
+                document.getElementById('message').innerHTML = `<div class="error">${data.detail || '登録に失敗しました'}</div>`;
+            }
+        } catch (error) {
+            document.getElementById('message').innerHTML = '<div class="error">通信エラーが発生しました</div>';
         }
     });
 </script>

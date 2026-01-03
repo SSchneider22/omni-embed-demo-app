@@ -8,7 +8,7 @@
 
     <div id="message"></div>
 
-    <form hx-post="/api/login" hx-target="#message" hx-swap="innerHTML">
+    <form id="loginForm">
         <div class="form-group">
             <label for="email">メールアドレス</label>
             <input type="email" id="email" name="email" required>
@@ -28,12 +28,32 @@
 </div>
 
 <script>
-    document.body.addEventListener('htmx:afterRequest', function(evt) {
-        if (evt.detail.successful) {
-            window.location.href = '/me';
-        } else {
-            const response = JSON.parse(evt.detail.xhr.responseText);
-            document.getElementById('message').innerHTML = `<div class="error">${response.detail || 'ログインに失敗しました'}</div>`;
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const formData = {
+            email: document.getElementById('email').value,
+            password: document.getElementById('password').value
+        };
+
+        try {
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                window.location.href = '/me';
+            } else {
+                document.getElementById('message').innerHTML = `<div class="error">${data.detail || 'ログインに失敗しました'}</div>`;
+            }
+        } catch (error) {
+            document.getElementById('message').innerHTML = '<div class="error">通信エラーが発生しました</div>';
         }
     });
 </script>
